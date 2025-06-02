@@ -1,10 +1,12 @@
 <?php 
 
-class Model extends Database{
-
-    protected $table='users';
+trait Model {
+   use Database;
+     
     protected $limit='10';
     protected $offset='0';
+    protected $order="desc";
+    protected $order_column="id";
     public function query($query,$data=[]){
         $conn=$this->getConnection();
         $stm=$conn->prepare($query);
@@ -18,6 +20,12 @@ class Model extends Database{
         }
         return false;
     }
+
+
+public function findAll(){
+    $query="SELECT * from $this->table order by $this->order_column $this->order limit $this->limit offset $this->offset";
+    return $this->query($query);
+}
 
 
 public function where($data, $data_not = []) {
@@ -39,9 +47,9 @@ public function where($data, $data_not = []) {
     }
 
     $query = rtrim($query, "AND ");
-
+    $query.= " order by $this->order_column $this->order limit $this->limit offset $this->offset";
     $data = array_merge($data, $data_not);
-
+   
     return $this->query($query, $data);
 }
 
@@ -80,6 +88,16 @@ public function where($data, $data_not = []) {
         return false;
     }
     
+      //remove unwanted data//
+
+    if (!empty($this->allowedColumns)) {
+        foreach($data as $key=>$value){
+         if(!in_array($key, $this->allowedColumns)){
+            unset($data[$key]);
+         }
+        }
+    }
+
     $keys=array_keys($data);
     //$query = "INSERT INTO $this->table (" . implode(',', $keys) . ") VALUES (:" . implode(', :', $keys) . ")";
 
@@ -103,8 +121,14 @@ public function where($data, $data_not = []) {
  }
 
  public function update($id, $data, $id_column = 'id') {
-    if (empty($data)) {
-        return false;
+     //remove unwanted data//
+
+    if (!empty($this->allowedColumns)) {
+        foreach($data as $key=>$value){
+         if(!in_array($key, $this->allowedColumns)){
+            unset($data[$key]);
+         }
+        }
     }
 
     $keys = array_keys($data);

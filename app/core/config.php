@@ -10,5 +10,5 @@ if($_SERVER['SERVER_NAME']=='localhost'){
     define('ROOT','https://www.youwebsite.com');
 }
 
-
+    define("DEBUG",true);
 ?>

@@ -6,5 +6,9 @@ class functions{
         echo "</pre>";
     
     }
+
+    public static function esc($str){
+       return htmlspecialchars(($str));
+    }
 }
 ?>
